@@ -1,19 +1,24 @@
 import { Module } from '@nestjs/common';
+import { join } from 'path'
 import { GraphQLModule } from '@nestjs/graphql';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from './users/users.module';
+
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from './common/modules/config';
 import { DateScalar } from './common/scalars/date.scalar';
 import { EmailScalar } from './common/scalars/email.scalar';
+import { ApolloDriver } from '@nestjs/apollo';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(),
+    ConfigModule,
     GraphQLModule.forRoot({
-      autoSchemaFile: 'src/schema.gql',
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       debug: process.env.NODE_ENV === 'development',
+      playground: process.env.NODE_ENV === 'development',
+      driver: ApolloDriver,
     }),
-    UsersModule,
+    AuthModule,
   ],
   providers: [DateScalar, EmailScalar],
 })
-export class AppModule {}
+export class AppModule { }
