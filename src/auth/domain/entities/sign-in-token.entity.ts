@@ -1,10 +1,11 @@
-import { BaseEntity } from "src/common/entities/base.entity";
-import { UniqueId } from "src/common/entities/identifier";
+import { BaseEntity } from "src/common/domains/base.entity";
+import { UniqueId } from "src/common/domains/identifier";
 
 interface SignInTokenProps {
   expiredAt: Date;
   phoneNumber: string;
   token: string;
+  otp: string;
 }
 
 export class SignInTokenEntity extends BaseEntity<SignInTokenProps> {
@@ -22,6 +23,14 @@ export class SignInTokenEntity extends BaseEntity<SignInTokenProps> {
 
   get token() {
     return this.props.token;
+  }
+
+  get otp() {
+    return this.props.otp;
+  }
+
+  isExpired(leewaySeconds: number = 0) {
+    return this.expiredAt.getTime() < Date.now() - leewaySeconds * 1000
   }
 
   public static create(props: SignInTokenProps, id?: UniqueId) {

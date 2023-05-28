@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigProvider } from './config.provider';
 import { ConfigService } from './config.service';
 
+@Global()
 @Module({
   controllers: [],
   providers: [

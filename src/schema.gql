@@ -8,6 +8,11 @@ type SignInToken {
   phoneNumber: String!
 }
 
+type VerifyOtpOutDto {
+  accessToken: String!
+  refreshToken: String!
+}
+
 """Date custom scalar type"""
 scalar Date
 
@@ -20,8 +25,15 @@ type Query {
 
 type Mutation {
   requestSignIn(request: RequestSignInDto!): SignInToken!
+  verifyOtp(request: VerifyOtpInDto!): VerifyOtpOutDto!
 }
 
 input RequestSignInDto {
   phoneNumber: String!
+}
+
+input VerifyOtpInDto {
+  phoneNumber: String!
+  otp: String!
+  token: String!
 }

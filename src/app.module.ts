@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
-import { join } from 'path'
 import { GraphQLModule } from '@nestjs/graphql';
+import { join } from 'path';
+import { ApolloDriver } from '@nestjs/apollo';
+import { JwtModule } from '@nestjs/jwt';
+import { MongooseModule, MongooseModuleFactoryOptions } from '@nestjs/mongoose';
 
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from './common/modules/config';
+import { ConfigModule, ConfigService } from './common/modules/config';
 import { DateScalar } from './common/scalars/date.scalar';
 import { EmailScalar } from './common/scalars/email.scalar';
-import { ApolloDriver } from '@nestjs/apollo';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -17,7 +20,27 @@ import { ApolloDriver } from '@nestjs/apollo';
       playground: process.env.NODE_ENV === 'development',
       driver: ApolloDriver,
     }),
+    MongooseModule.forRootAsync({
+      useFactory: (configService: ConfigService): MongooseModuleFactoryOptions => {
+        return {
+          uri: configService.get('MONGO_URI'),
+          maxPoolSize: 50,
+          autoIndex: false,
+          autoCreate: false,
+          appName: 'nestjs-graphql',
+        }
+      },
+      inject: [ConfigService],
+    }),
+    JwtModule.registerAsync({
+      global: true,
+      useFactory: (config: ConfigService) => ({
+        secret: config.get('JWT_SECRET'),
+      }),
+      inject: [ConfigService]
+    }),
     AuthModule,
+    UserModule,
   ],
   providers: [DateScalar, EmailScalar],
 })
